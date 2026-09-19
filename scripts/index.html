@@ -1,74 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>SPY Market Data</title>
+  <title>SPY Market Data Test</title>
 </head>
 
 <body>
 <script>
 window['ai_edge_gallery_get_result'] = async (data) => {
   try {
-    const jsonData = JSON.parse(data);
-
-    const symbol = jsonData.symbol || "SPY";
-
-    if (symbol !== "SPY") {
-      throw new Error("This skill only supports SPY.");
-    }
-
-    const url =
-      "https://query1.finance.yahoo.com/v8/finance/chart/SPY?range=5d&interval=1d";
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const yahooData = await response.json();
-
-    const result = yahooData?.chart?.result?.[0];
-
-    if (!result) {
-      throw new Error("No market data returned.");
-    }
-
-    const timestamps = result.timestamp;
-    const quote = result.indicators?.quote?.[0];
-
-    if (!timestamps || !quote) {
-      throw new Error("Incomplete market data returned.");
-    }
-
-    const index = timestamps.length - 1;
-
-    const candle = {
-      timestamp: new Date(timestamps[index] * 1000).toISOString(),
-      open: quote.open?.[index],
-      high: quote.high?.[index],
-      low: quote.low?.[index],
-      close: quote.close?.[index],
-      volume: quote.volume?.[index]
-    };
-
-    if (
-      candle.open == null ||
-      candle.high == null ||
-      candle.low == null ||
-      candle.close == null ||
-      candle.volume == null
-    ) {
-      throw new Error("Latest candle contains missing values.");
-    }
-
     return JSON.stringify({
-      result: candle
+      result: {
+        status: "SKILL_EXECUTION_TEST_PASSED",
+        message: "JavaScript skill executed successfully."
+      }
     });
-
   } catch (error) {
-    console.error(error);
-
     return JSON.stringify({
       error: String(error.message || error)
     });
