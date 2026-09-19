@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>SPY Market Data</title>
 </head>
+
 <body>
 <script>
-(async () => {
+window['ai_edge_gallery_get_result'] = async (data) => {
   try {
+    const jsonData = JSON.parse(data);
+
+    const symbol = jsonData.symbol || "SPY";
+
+    if (symbol !== "SPY") {
+      throw new Error("This skill only supports SPY.");
+    }
+
     const url =
       "https://query1.finance.yahoo.com/v8/finance/chart/SPY?range=5d&interval=1d";
 
@@ -53,13 +62,18 @@
       throw new Error("Latest candle contains missing values.");
     }
 
-    document.body.textContent = JSON.stringify(candle);
+    return JSON.stringify({
+      result: candle
+    });
+
   } catch (error) {
-    document.body.textContent = JSON.stringify({
+    console.error(error);
+
+    return JSON.stringify({
       error: String(error.message || error)
     });
   }
-})();
+};
 </script>
 </body>
 </html>
