@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SPY Market Data Test</title>
+  <title>SPY Market Data</title>
 </head>
 
 <body>
@@ -19,8 +19,48 @@ window['ai_edge_gallery_get_result'] = async (data) => {
 
     const apiData = await response.json();
 
+    if (!apiData || apiData.symbol !== "SPY") {
+      throw new Error("Unexpected or missing SPY data.");
+    }
+
+    const candle = {
+      timestamp: apiData.td || null,
+      open: apiData.o ?? null,
+      high: apiData.h ?? null,
+      low: apiData.l ?? null,
+      close: apiData.p ?? null,
+      volume: apiData.v ?? null
+    };
+
+    if (
+      candle.timestamp == null ||
+      candle.open == null ||
+      candle.high == null ||
+      candle.low == null ||
+      candle.close == null ||
+      candle.volume == null
+    ) {
+      throw new Error("Required SPY fields are missing.");
+    }
+
+    const validOHLC =
+      candle.high >= candle.low &&
+      candle.high >= candle.open &&
+      candle.high >= candle.close &&
+      candle.low <= candle.open &&
+      candle.low <= candle.close;
+
     return JSON.stringify({
-      result: apiData
+      result: {
+        symbol: "SPY",
+        timestamp: candle.timestamp,
+        open: candle.open,
+        high: candle.high,
+        low: candle.low,
+        close: candle.close,
+        volume: candle.volume,
+        ohlc_valid: validOHLC
+      }
     });
 
   } catch (error) {
