@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>External Request Test</title>
+  <title>SPY Market Data Test</title>
 </head>
 
 <body>
@@ -10,17 +10,41 @@
 window['ai_edge_gallery_get_result'] = async (data) => {
   try {
     const response = await fetch(
-      "https://jsonplaceholder.typicode.com/todos/1"
+      "https://query1.finance.yahoo.com/v8/finance/chart/SPY?range=5d&interval=1d"
     );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    const result = await response.json();
+    const yahooData = await response.json();
+
+    const result = yahooData?.chart?.result?.[0];
+
+    if (!result) {
+      throw new Error("No market data returned.");
+    }
+
+    const timestamps = result.timestamp;
+    const quote = result.indicators?.quote?.[0];
+
+    if (!timestamps || !quote) {
+      throw new Error("Incomplete market data returned.");
+    }
+
+    const index = timestamps.length - 1;
+
+    const candle = {
+      timestamp: new Date(timestamps[index] * 1000).toISOString(),
+      open: quote.open?.[index],
+      high: quote.high?.[index],
+      low: quote.low?.[index],
+      close: quote.close?.[index],
+      volume: quote.volume?.[index]
+    };
 
     return JSON.stringify({
-      result: result
+      result: candle
     });
 
   } catch (error) {
