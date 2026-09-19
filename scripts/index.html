@@ -26,9 +26,9 @@ window['ai_edge_gallery_get_result'] = async (data) => {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    const data = await response.json();
+    const yahooData = await response.json();
 
-    const result = data?.chart?.result?.[0];
+    const result = yahooData?.chart?.result?.[0];
 
     if (!result) {
       throw new Error("No market data returned.");
